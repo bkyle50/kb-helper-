@@ -15,9 +15,6 @@ export async function POST(req: Request) {
     return new Response('Bad request', { status: 400 });
   }
 
-  const hasKey = !!process.env.ANTHROPIC_API_KEY;
-  console.log('[Trillion] key present:', hasKey, '| msgs:', messages?.length);
-
   const modelMessages = await convertToModelMessages(messages);
 
   const result = streamText({
@@ -29,10 +26,8 @@ export async function POST(req: Request) {
   return createUIMessageStreamResponse({
     stream: toUIMessageStream({
       stream: result.stream,
-      onError(error) {
-        const msg = error instanceof Error ? error.message : String(error);
-        console.error('[Trillion] stream error:', msg);
-        return msg; // expose actual error for diagnosis
+      onError() {
+        return 'An error occurred. Please try again.';
       },
     }),
   });

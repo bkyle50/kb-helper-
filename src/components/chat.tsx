@@ -5,7 +5,7 @@ import { isTextUIPart } from 'ai';
 import { useEffect, useRef, useState } from 'react';
 
 export function Chat() {
-  const { messages, sendMessage, status, error } = useChat();
+  const { messages, sendMessage, status } = useChat();
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -32,17 +32,12 @@ export function Chat() {
 
   return (
     <div className="flex flex-col h-full max-w-2xl mx-auto w-full px-4">
-      {/* message list */}
       <div className="flex-1 overflow-y-auto py-8 space-y-6">
         {messages.length === 0 && (
           <p className="text-center text-sm opacity-40 mt-24 select-none">
             Trillion is ready.
           </p>
         )}
-        <pre className="text-[9px] opacity-40 break-all whitespace-pre-wrap">
-          {`status:${status} msgs:${messages.length} err:${error?.message ?? 'none'}\n`}
-          {messages.map((m) => `[${m.role}] parts:${JSON.stringify(m.parts)}`).join('\n')}
-        </pre>
         {messages.map((msg) => {
           const text = msg.parts
             .filter(isTextUIPart)
@@ -80,7 +75,6 @@ export function Chat() {
         <div ref={bottomRef} />
       </div>
 
-      {/* input bar */}
       <form
         onSubmit={handleSubmit}
         className="sticky bottom-0 pb-6 pt-2 bg-gradient-to-t from-background via-background to-transparent"
