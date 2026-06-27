@@ -1,4 +1,4 @@
-import { streamText, convertToModelMessages, toUIMessageStream, createUIMessageStreamResponse } from 'ai';
+import { generateText, convertToModelMessages } from 'ai';
 import type { UIMessage } from 'ai';
 import { brain } from '@/lib/ai/provider';
 import { systemPrompt } from '@/lib/ai/system-prompt';
@@ -26,19 +26,16 @@ export async function POST(req: Request) {
 
   console.log('[Trillion] modelMessages count:', modelMessages.length);
 
-  const result = streamText({
-    model: brain,
-    system: systemPrompt,
-    messages: modelMessages,
-  });
-
-  return createUIMessageStreamResponse({
-    stream: toUIMessageStream({
-      stream: result.stream,
-      onError(error) {
-        console.error('[Trillion] stream error:', error);
-        return 'An error occurred. Please try again.';
-      },
-    }),
-  });
+  try {
+    const result = await generateText({
+      model: brain,
+      system: systemPrompt,
+      messages: modelMessages,
+    });
+    console.log('[Trillion] got response:', result.text.slice(0, 50));
+    return Response.json({ text: result.text });
+  } catch (err) {
+    console.error('[Trillion] generateText error:', err);
+    return new Response(String(err), { status: 500 });
+  }
 }
