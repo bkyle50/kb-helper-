@@ -7,6 +7,11 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('[Trillion] ANTHROPIC_API_KEY is not set');
+    return new Response('Server misconfiguration: missing API key', { status: 500 });
+  }
+
   let messages: UIMessage[];
 
   try {
