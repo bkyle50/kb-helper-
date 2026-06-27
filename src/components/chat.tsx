@@ -5,7 +5,7 @@ import { isTextUIPart } from 'ai';
 import { useEffect, useRef, useState } from 'react';
 
 export function Chat() {
-  const { messages, sendMessage, status } = useChat();
+  const { messages, sendMessage, status, error } = useChat();
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -20,7 +20,7 @@ export function Chat() {
     const text = input.trim();
     if (!text || isStreaming) return;
     setInput('');
-    sendMessage({ role: 'user', parts: [{ type: 'text', text }] });
+    sendMessage({ text });
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -39,6 +39,10 @@ export function Chat() {
             Trillion is ready.
           </p>
         )}
+        <pre className="text-[9px] opacity-40 break-all whitespace-pre-wrap">
+          {`status:${status} msgs:${messages.length} err:${error?.message ?? 'none'}\n`}
+          {messages.map((m) => `[${m.role}] parts:${JSON.stringify(m.parts)}`).join('\n')}
+        </pre>
         {messages.map((msg) => {
           const text = msg.parts
             .filter(isTextUIPart)
