@@ -44,16 +44,10 @@ export function Chat() {
           {messages.map((m) => `[${m.role}] parts:${JSON.stringify(m.parts)}`).join('\n')}
         </pre>
         {messages.map((msg) => {
-          // Try isTextUIPart first; fall back to any part with a .text string
           const text = msg.parts
             .filter(isTextUIPart)
             .map((p) => p.text)
-            .join('')
-            ||
-            msg.parts
-              .filter((p): p is { type: string; text: string } => 'text' in p && typeof (p as { text?: unknown }).text === 'string' && p.type !== 'step-start')
-              .map((p) => p.text)
-              .join('');
+            .join('');
           if (!text) return null;
           return (
             <div
