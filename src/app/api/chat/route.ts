@@ -15,6 +15,9 @@ export async function POST(req: Request) {
     return new Response('Bad request', { status: 400 });
   }
 
+  const hasKey = !!process.env.ANTHROPIC_API_KEY;
+  console.log('[Trillion] key present:', hasKey, '| msgs:', messages?.length);
+
   const modelMessages = await convertToModelMessages(messages);
 
   const result = streamText({
