@@ -15,18 +15,25 @@ export async function POST(req: Request) {
     return new Response('Bad request', { status: 400 });
   }
 
+  console.log('[Trillion] messages count:', messages.length);
+
   const modelMessages = await convertToModelMessages(messages);
+
+  console.log('[Trillion] modelMessages count:', modelMessages.length);
 
   const result = streamText({
     model: brain,
     system: systemPrompt,
     messages: modelMessages,
-    onError({ error }) {
-      console.error('[Trillion] streamText error:', error);
-    },
   });
 
   return createUIMessageStreamResponse({
-    stream: toUIMessageStream({ stream: result.stream }),
+    stream: toUIMessageStream({
+      stream: result.stream,
+      onError(error) {
+        console.error('[Trillion] stream error:', error);
+        return 'An error occurred. Please try again.';
+      },
+    }),
   });
 }
