@@ -30,8 +30,9 @@ export async function POST(req: Request) {
     stream: toUIMessageStream({
       stream: result.stream,
       onError(error) {
-        console.error('[Trillion] stream error:', error);
-        return 'An error occurred. Please try again.';
+        const msg = error instanceof Error ? error.message : String(error);
+        console.error('[Trillion] stream error:', msg);
+        return msg; // expose actual error for diagnosis
       },
     }),
   });
