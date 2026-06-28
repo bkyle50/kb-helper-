@@ -70,6 +70,20 @@ export async function deleteMemory(memoryId: string): Promise<void> {
   }
 }
 
+export async function getMemory(memoryId: string): Promise<MemoryItem | null> {
+  if (!STORE_ID || !API_KEY) return null;
+  try {
+    const res = await fetch(`${BASE}/beta/memory-stores/${STORE_ID}/memories/${memoryId}`, {
+      headers: HEADERS,
+    });
+    if (res.ok) return res.json() as Promise<MemoryItem>;
+    const all = await listMemories();
+    return all.find((m) => m.id === memoryId) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function buildMemoryContext(): Promise<string> {
   const memories = await listMemories();
   if (memories.length === 0) return '';
