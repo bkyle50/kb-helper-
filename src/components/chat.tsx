@@ -1,11 +1,20 @@
 'use client';
 
 import { useChat } from '@ai-sdk/react';
-import { isTextUIPart } from 'ai';
+import { isTextUIPart, type UIMessage } from 'ai';
 import { useEffect, useRef, useState } from 'react';
 
-export function Chat() {
-  const { messages, sendMessage, status } = useChat();
+interface ChatProps {
+  conversationId: string;
+  initialMessages?: UIMessage[];
+  onSave?: (messages: UIMessage[]) => void;
+}
+
+export function Chat({ conversationId, initialMessages = [], onSave }: ChatProps) {
+  const { messages, sendMessage, status } = useChat({
+    id: conversationId,
+    messages: initialMessages,
+  });
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -14,6 +23,12 @@ export function Chat() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (status === 'ready' && messages.length > 0) {
+      onSave?.(messages);
+    }
+  }, [status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
